@@ -1,6 +1,6 @@
 # 本项目采用mui+vue开发
-  接口来自豆瓣网开放api
-![榜单.png](http://yun.sevenit.cn/2020/04/20/bde513315fbd3.png)
+
+![榜单.png](http://yun.sevenit.cn/2020/04/20/bde513315fbd3.png) 
 ![北美票房榜.png](http://yun.sevenit.cn/2020/04/20/8ae4b9b55173a.png)
 ![电影详情1.png](http://yun.sevenit.cn/2020/04/20/355e71d27d2b7.png)
 ![豆瓣TOP250.png](http://yun.sevenit.cn/2020/04/20/905a9db4bfc34.png)
