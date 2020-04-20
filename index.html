@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>豆瓣电影项目</title>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+	<link rel="stylesheet" type="text/css" href="css/iconfont.css"/>
+</head>
+<body>
+<!-- 底部选项卡 -->
+<nav class="mui-bar mui-bar-tab">
+	<a class="mui-tab-item mui-active" id="home">
+		<span class="mui-icon iconfont icon-resou"></span>
+		<span class="mui-tab-label">热映</span>
+	</a>
+	<a class="mui-tab-item" id="list">
+		<span class="mui-icon mui-icon mui-icon-list"></span>
+		<span class="mui-tab-label">榜单</span>
+	</a>
+	<a class="mui-tab-item" id="setting">
+		<span class="mui-icon mui-icon-gear"></span>
+		<span class="mui-tab-label">设置</span>
+	</a>
+</nav>
+<script src="js/mui.min.js"></script>
+<script>
+	mui.init()
+	//默认打开子页序号
+	var index = 0
+	var subpages = ['pages/hotList.html','pages/list.html','pages/setting.html']
+	mui.plusReady(function () {
+		for (var i = 0; i < subpages.length; i++) {
+			var sub = plus.webview.create(subpages[i],subpages[i],{
+				top:'0',
+				bottom:'50px'
+			})
+			if(i != index) {
+				sub.hide()
+			} else{
+				sub.show()
+			}
+			var self = plus.webview.currentWebview()
+			
+		}
+		mui('.mui-bar-tab a').each(function(i){
+			this.addEventListener('tap',function(){
+				if(i==index) return
+				//显示目标选项卡
+				plus.webview.show(subpages[i])
+				//隐藏目标选项卡
+				plus.webview.hide(subpages[index])
+				//更改当前活动选项卡
+				index=i
+			})
+		})
+	})
+</script>
+</body>
+</html>

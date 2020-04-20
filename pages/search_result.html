@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>搜索结果</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="../css/mui.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="../css/movieList.css"/>
+	<style type="text/css">
+		.none{
+			margin-top: 50px;
+			text-align: center;
+		}
+		.none img {
+			width: 80px;
+			height: 80px;
+		}
+		.nene p{
+			font-size: 20px;
+			margin-top: 10px;
+		}
+	</style>
+</head>
+<body>
+<!-- header -->
+<header class="mui-bar mui-bar-nav">
+	<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+	<h1 class="mui-title">搜索结果</h1>
+</header>
+
+<!-- 主体内容 -->
+<div class="mui-content" id="app">
+	<!-- 暂无数据 -->
+	<div class="none" v-if="movieList.length ==0">
+		<img src="../img/none.png" >
+		<p>暂无数据</p>
+	</div>
+	
+	<!-- 有数据 -->
+	<ul class="mui-table-view" v-cloak v-if="movieList.length !=0" style="margin-top: 0;">
+		<li class="mui-table-view-cell mui-media" v-for="(item,index) in movieList" :key="index" @click="open_detail (item)">
+			<a href="javascript:;">
+				<img class="mui-pull-left mui-img" :src="item.img | setImg">
+				<div class="mui-media-body">
+					<p class="title">{{item.nm}}</p>
+					<p>{{item.cat | type}} <span style="padding-left: 10px;color:#F79D18;">{{item.sc==0 ? '暂无评': item.sc}}分</span></p>
+					<p>导演：{{item.dir | type}}</p>
+					<p>主演：{{item.star | type}}</p>
+				</div>
+			</a>
+		</li>
+	</ul>
+</div>
+<script src="../js/vue.js"></script>
+<script src="../js/mui.js"></script>
+<script src="../js/tools.js"></script>
+<script src="../js/openDetail.js"></script>
+<script type="text/javascript">
+	mui.init()
+	
+	mui.plusReady(function () {
+		// 获取当前webview对象
+		var ws = plus.webview.currentWebview()
+		mui.getJSON('http://39.97.33.178/api/searchList',{
+			cityId: 1,
+			kw: ws.value
+		}, res => {
+			if (res.status == 0){
+				app.movieList = res.data.movies.list
+			} else {
+				app.movieList = []
+			}
+		})
+	})
+	
+	const app = new Vue({
+		el:'#app',
+		data:{
+			movieList:[]
+		},
+		methods:{
+			// 打开电影详情页
+			open_detail (item) {
+				mui.fire(detail,'get_detail',{
+					post_id: item.id,
+					cover: item.img.replace('w.h', '60.90'),
+					average: item.sc,
+					title: item.nm,
+					genres: item.cat.replace(/\,/g, '/'),
+					cast: item.star.replace(/\,/g, '/'),
+				})
+				titleNView.titleText = item.nm
+				detail.setStyle({
+					titleNView:titleNView
+				})
+				setTimeout(() =>{
+					detail.show('slide-in-right',300)
+				},150)
+			}
+		}
+	})
+</script>
+</body>
+</html>

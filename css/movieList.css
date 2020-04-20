@@ -1,0 +1,19 @@
+/*电影列表*/
+.mui-img{
+	width: 60px;
+	height: 90px;
+	margin-right: 10px;
+}
+.title{
+	margin-bottom: 5px;
+	color: #000;
+	font-weight: bold;
+	font-size: 15px;
+}
+.orange{
+	color: #F79D18;
+	margin-left: 10px;
+}
+[v-cloak] {
+	display: none;
+}

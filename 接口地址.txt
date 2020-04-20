@@ -1,0 +1,55 @@
+接口1：豆瓣热映
+请求地址：https://api.douban.com/v2/movie/in_theaters
+请求方式：get
+请求参数：
+apikey:'0b2bdeda43b5688921839c8ecb20399b'
+start : 数据的开始项
+count：单页条数
+
+接口2：即将上映
+请求地址：https://api.douban.com/v2/movie/coming_soon
+请求方式：get
+请求参数：
+apikey:'0b2bdeda43b5688921839c8ecb20399b'
+
+接口3：电影top250 
+请求地址：http://api.douban.com/v2/movie/top250
+请求方式：get
+请求参数：
+apikey:'0b2bdeda43b5688921839c8ecb20399b'
+start : 数据的开始项
+count：单页条数
+
+接口4：北美票房榜
+请求地址：https://api.douban.com/v2/movie/us_box
+请求方式：get
+请求参数：
+apikey:'0b2bdeda43b5688921839c8ecb20399b'
+
+接口5：电影搜索
+请求地址：http://39.97.33.178/api/searchList
+请求方式：get
+请求参数：cityId(城市Id，如 1:北京,10:上海,50:杭州,103:新乡)、kw(电影关键字)
+
+接口6：电影详情
+请求地址：https://api.douban.com/v2/movie/subject/:id
+id: 电影id
+请求方式：get
+请求参数：
+apikey:'0b2bdeda43b5688921839c8ecb20399b'
+
+接口7：电影评论
+请求地址：https://api.douban.com/v2/movie/subject/:id/comments
+id: 电影id
+请求方式：get
+请求参数：
+apikey:'0b2bdeda43b5688921839c8ecb20399b'
+start : 数据的开始项
+count：单页条数
+
+接口8：演员详情
+请求地址：https://api.douban.com/v2/movie/celebrity/:id
+id: 演员id
+请求方式：get
+请求参数：
+apikey:'0b2bdeda43b5688921839c8ecb20399b'

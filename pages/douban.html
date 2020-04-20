@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>豆瓣Top250</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="../css/mui.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="../css/movieList.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/t250ticket.css"/>
+</head>
+<body>
+<div id="app">
+	<!-- header -->
+	<header class="mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">豆瓣Top250</h1>
+	</header>
+	
+	<!-- 内容 -->
+	<div class="mui-content" id="content">
+		<!-- 区域滚动 -->
+		<div class="mui-scroll-wrapper mui-slider-indicator mui-segmented-control mui-segmented-control-inverted">
+			<div class="mui-scroll" id="nav">
+				<a class="mui-control-item" v-for="(item,index) in total/50" :tapindex="index*50">
+					{{50*index+1}}-{{50*(index+1)}}
+				</a>
+			</div>
+		</div>
+		
+		<!-- 列表 -->
+		<ul class="mui-table-view" v-cloak >
+			<li class="mui-table-view-cell mui-media" v-for="(item,index) in movieList" :key="index" @click="open_detail (item)">
+				<div style="display: flex;width: 50%;margin: 0 auto;">
+					<span class="line"></span>
+					<span class="num">{{index + tapindex + 1}}</span>
+					<span class="line"></span>
+				</div>
+				<a href="javascript:;">
+					<img class="mui-pull-left mui-img" :src="item.img">
+					<div class="mui-media-body">
+						<p class="title">{{item.title}}</p>
+						<p class="mui-ellipsis">豆瓣评分：
+							<span style="color:#F79D18;">{{item.average==0 ? '暂无评': item.average}}分</span>
+						</p>
+						<p class="mui-ellipsis">导演：{{item.directors}}</p>
+						<p class="mui-ellipsis">
+							演员：{{item.casts}}
+						</p>
+					</div>
+				</a>
+			</li>
+		</ul>
+	</div>
+</div>
+<script src="../js/mui.js"></script>
+<script src="../js/vue.js"></script>
+<script src="../js/convert.js"></script>
+<script src="../js/openDetail.js"></script>
+<script type="text/javascript">
+	const app = new Vue({
+		el: '#app',
+		data:{
+			movieList: [],	// 电影列表
+			total: 0,	
+			tapindex: 0
+		},
+		methods:{
+			// 打开电影详情页
+			open_detail (item) {	
+				mui.fire(detail,'get_detail',{
+					post_id: item.id,
+					cover: item.img,
+					average: item.average,
+					title: item.title,
+					genres: item.genres,
+					cast: item.directors,
+					time: item.mainland_pubdate
+				})
+				titleNView.titleText = item.title;
+				detail.setStyle({
+					titleNView:titleNView
+				})
+				setTimeout(() =>{
+					detail.show('slide-in-right',300)
+				},150)
+			},
+		}
+	})
+	
+	// 配置上拉加载参数
+	mui.init({
+		pullRefresh: {
+			container: '#content',
+			up: {
+				auto: true,
+				contentnomore: '没有更多数据了',
+				callback: pullup
+			}
+		}
+	})
+	
+	// 上拉加载逻辑
+	function pullup() {
+		// 电影top250 接口请求
+		mui.getJSON('http://api.douban.com/v2/movie/top250',{
+			apikey:'0b2bdeda43b5688921839c8ecb20399b',
+			start: app.movieList.length + app.tapindex,
+			count: 10
+		}, res => {
+			app.total = res.total
+			app.movieList = app.movieList.concat(convert(res.subjects))
+			// 结束上拉加载
+			mui('#content').pullRefresh().endPullupToRefresh(app.movieList.length >= 50)
+		})
+	}
+	
+	mui("#nav").on("tap", "a", function() {
+		// 开始项
+		app.tapindex = this.getAttribute('tapindex')*1
+		
+		app.movieList = []
+		//主动上拉加载
+		mui('#content').pullRefresh().pullupLoading()
+	})
+
+	mui('.mui-scroll-wrapper').scroll({
+		scrollY: false, // 是否竖向滚动
+		scrollX: true, // 是否横向滚动
+		deceleration: 0.0005  // flick 减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+	})	
+</script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!-- 榜单 -->
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>榜单</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="../css/mui.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="../css/movieList.css"/>
+	<style type="text/css">
+		.demo{
+			height: 140px;
+			margin: 15px;
+			text-align: center;
+			line-height: 140px;
+			color: #fff;
+			border-radius: 8px;	 
+		}
+		.coming{
+			padding: 10px 15px;
+			border-bottom: 1px solid #ccc;
+		}
+	</style>
+</head>
+<body>
+<!-- header -->
+<header class="mui-bar mui-bar-nav">
+	<h1 class="mui-title">榜单</h1>
+</header>
+
+<!-- content -->
+<div class="mui-content" style="background-color: #fff;">
+	<!-- 轮播图 -->
+	<div id="slider" class="mui-slider" >
+	  <div class="mui-slider-group mui-slider-loop">
+		<div class="mui-slider-item mui-slider-item-duplicate">
+		  <a href="#">
+			<img src="../img/banner3.jpg">
+		  </a>
+		</div>
+		<div class="mui-slider-item">
+		  <a href="#">
+			<img src="../img/banner1.jpg">
+		  </a>
+		</div>
+		<div class="mui-slider-item">
+		  <a href="#">
+			<img src="../img/banner2.jpg">
+		  </a>
+		</div>
+		<div class="mui-slider-item">
+		  <a href="#">
+			<img src="../img/banner3.jpg">
+		  </a>
+		</div>
+		<div class="mui-slider-item mui-slider-item-duplicate">
+		  <a href="#">
+			<img src="../img/banner1.jpg">
+		  </a>
+		</div>
+	  </div>
+	  <div class="mui-slider-indicator">
+		<div class="mui-indicator mui-active"></div>
+		<div class="mui-indicator"></div>
+		<div class="mui-indicator"></div>
+		<div class="mui-indicator"></div>
+	  </div>
+	</div>
+	
+	<!-- 豆瓣Top250 和 北美票房榜 -->
+	<div class="mui-row">
+		<div class="mui-col-sm-6 mui-col-xs-6" id="douban">
+			<div class="demo" style="background: linear-gradient(#941ae6,#f1e0fc);">
+				豆瓣Top250
+			</div>	
+		</div>
+		<div class="mui-col-sm-6 mui-col-xs-6" id="ticket">
+			<div class="demo" style="background: linear-gradient(#3370cc,#cee1fd);">
+				北美票房榜
+			</div>	
+		</div>
+	</div>
+	
+	<!-- 即将上映 -->
+	<div class="coming">
+		即将上映
+	</div>
+	
+	<!-- 列表 -->
+	<ul class="mui-table-view" v-cloak v-if="movieList.length !=0" id="app">
+		<li class="mui-table-view-cell mui-media" v-for="item in movieList" :key="item.id" @click="open_detail (item)">
+			<a href="javascript:;">
+				<img class="mui-pull-left mui-img" :src="item.img">
+				<div class="mui-media-body">
+					<p class="title">{{item.title}}</p> 
+					<p class="mui-ellipsis">
+						<span>{{item.genres}}</span>
+						<span class="mui-pull-right" style="color: #000;">{{item.mainland_pubdate}}</span>
+					</p>
+					<p class="mui-ellipsis">导演：{{item.directors}}</p>
+					<p class="mui-ellipsis">主演：{{item.casts}}</p>
+				</div>
+			</a>
+		</li>
+	</ul>	
+</div>
+
+<script src="../js/mui.js"></script>
+<script src="../js/vue.js"></script>
+<script src="../js/convert.js"></script>
+<script src="../js/openDetail.js"></script>
+<script type="text/javascript">
+	mui.init()
+	
+	// 设置轮播图
+	var gallery = mui('.mui-slider');
+	gallery.slider({
+	  interval:5000//自动轮播周期，若为0则不自动播放，默认为0；
+	})
+	
+	// 即将上映接口请求
+	mui.getJSON('https://api.douban.com/v2/movie/coming_soon', {
+		apikey:'0b2bdeda43b5688921839c8ecb20399b'
+	}, res =>{
+		app.movieList = convert(res.subjects)
+	})
+	
+	// 打开豆瓣Top250
+	mui('.mui-row').on('tap', '#douban', () =>{
+		mui.openWindow({
+			url: 'douban.html',
+			id: 'douban.html',
+		})
+	})
+	
+	// 打开北美票房榜
+	mui('.mui-row').on('tap', '#ticket', () =>{
+		mui.openWindow({
+			url: 'ticket.html',
+			id: 'ticket.html',
+		})
+	})
+	
+	const app = new Vue({
+		el:'#app',
+		data:{
+			movieList: []	// 电影列表
+		},
+		methods:{
+			// 打开电影详情页
+			open_detail (item) {
+				mui.fire(detail,'get_detail',{
+					post_id: item.id,
+					cover: item.img,
+					average: item.average,
+					title: item.title,
+					genres: item.genres,
+					cast: item.directors
+				})
+				titleNView.titleText = item.title;
+				detail.setStyle({
+					titleNView:titleNView
+				})
+				setTimeout(() =>{
+					detail.show('slide-in-right',300)
+				},150)
+			}
+		}
+	})
+</script>
+</body>
+</html>

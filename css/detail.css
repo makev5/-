@@ -1,0 +1,78 @@
+.mui-content{
+	background-color: #fff;
+}
+.banner_wrap{
+	height: 200px;
+	position: relative;
+	overflow: hidden;
+	background-color: #3C3C3C;
+}
+.banner_wrap img{
+	display: block;
+	margin: 10px auto;
+	width: 150px;
+	height: 180px;
+}
+.banner_wrap p{
+	position: absolute;
+	left: 15px;
+	bottom: 15px;
+	width: 90%;
+	font-size: 16px;
+	color: #fff;
+	line-height: 21px;
+}
+.casts {
+	margin: 0;
+	padding: 0;
+	display: flex;
+	overflow: hidden;
+}
+.casts li{
+	list-style: none;
+	flex: 0.2;
+	padding: 0 5px;
+}
+.casts li img{
+	width: 60;
+	height: 90px;
+}
+.mui-ellipsis-4{
+	display: -webkit-box;
+	overflow: hidden;
+	white-space: normal !important;
+	text-overflow: ellipsis;
+	word-wrap: break-word;
+	-webkit-line-clamp: 4;
+	-webkit-box-orient: vertical;
+}
+.intro{
+	margin-bottom: 0;
+}
+.average{
+	position: absolute;
+	top: 15px; 
+	right: 15px;
+	text-align: center;
+	background-color: #fff;
+	border-radius: 5px;
+	box-shadow: 0 1px 0px #C4C4C4;
+}
+.average p{
+	margin: 0;
+	padding: 0 10px;
+	margin-bottom: 0px !important;
+	font-size: 14px;	
+}
+.mui-table-view .mui-media-object {
+	line-height: 30px;
+	max-width: 30px;
+	height: 30px;
+	border-radius: 25px;
+}
+.title{
+	color: #ABABAB;
+	padding:10px 0;
+	font-size: 15px;
+	font-weight: bold;	
+}

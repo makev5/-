@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>搜索页</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="../css/mui.css" rel="stylesheet" />
+	<style type="text/css">
+		body{
+			background-color: #fff;
+		}
+		ul,li{
+			margin: 0;
+			padding: 0;
+		}
+		.mui-bar{
+			box-shadow: 0 0 1px #fff;
+			background-color: #fff;
+		}
+		.mui-bar-nav{
+			display: flex;
+			justify-content: space-between;
+		}
+		.mui-action-back{
+			line-height: 44px;
+			padding-right: 5px;
+			font-weight: bold;
+		}
+		.mui-content{
+			background-color: #fff;
+		}
+		.history{
+			display: flex;
+			justify-content: space-between;
+			background-color: #fff;
+			padding: 0 10px;
+		}
+		.items ul{
+			overflow: hidden;
+			display: block;
+		}
+		.items li{
+			margin: 5px 14px;
+			padding: 2px 20px;
+			list-style: none;
+			float: left;
+			border-radius: 15px;
+			text-align: center;
+			background-color: #E6E6E6;
+		}
+	</style>
+</head>
+<body>
+<div id="app">
+	<!-- header -->
+	<header class="mui-bar mui-bar-nav">
+		<div class="mui-input-row mui-search mui-col-xs-10">
+			<input type="search" id="search" v-model="searchValue" class="mui-input-clear" placeholder="电影/电视剧/影人" style="font-size: 10px;" >
+		</div>
+		<a class="mui-action-back mui-pull-right" style="color: #1082FE;">取消</a>
+	</header>
+	
+	<!-- 内容 -->
+	<div class="mui-content">
+		<!-- history -->
+		<h4 class="history">
+			<span>历史搜索</span>
+			<span class="mui-icon mui-icon-trash" style="color: #1082FE;" id="delete"></span>
+		</h4>
+		<!-- 历史值 -->
+		<ul class="items">
+			<li v-for="(item,index) in historyRecord" :key="index" @tap="open_result(item)">{{item}}</li>
+		</ul>
+	</div>
+</div>
+<script src="../js/vue.js"></script>
+<script src="../js/mui.js"></script>
+<script type="text/javascript">
+	mui.init()
+	
+	mui.plusReady(function () {
+		
+		var history = plus.storage.getItem("history")
+		if(history){
+			app.historyRecord = history.split(',')
+		}
+		
+		var search = document.getElementById("search")
+		search.addEventListener('keyup', e => {
+			if(e.keyCode == 13) {
+				var index = app.historyRecord.indexOf(search.value)
+				if(index !=-1) {
+					app.historyRecord.splice(index,1);
+				}
+				app.historyRecord.unshift(search.value)
+				// 存储或更新数据
+				plus.storage.setItem('history', app.historyRecord.toString())
+				mui.openWindow({
+					url: 'search_result.html',
+					id: 'search_result.html',
+					extras: {
+						value: search.value
+					}
+				})
+				// 清空搜索框
+				search.value = ''
+			}
+		})
+		
+		var Delete = document.getElementById("delete")
+		Delete.addEventListener('tap', ()=>{
+			if(confirm('确定要删除历史记录吗?')) {
+				plus.storage.removeItem('history')
+				app.historyRecord = []
+			}	
+		})
+	})
+	
+	const app = new Vue({
+		el: '#app',
+		data: {
+			searchValue: '',
+			historyRecord: []
+		},
+		methods:{	
+			open_result(item) {
+				mui.openWindow({
+					url: 'search_result.html',
+					id: 'search_result.html',
+					extras: {
+						value: item
+					}
+				})
+			}
+		}
+	})
+</script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>电影详情</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="../css/mui.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="../css/detail.css"/>
+</head>
+<body>
+<div class="mui-content" id="app">
+	<!-- 电影封面 -->
+	<div class="banner_wrap">
+		<img class="mui-media-object" :src="cover" >
+	</div>
+	
+	<!-- 标题 -->
+	<div class="mui-content" style="padding: 10px 10px;font-weight: normal;color: #414141;position: relative;background-color: #fff;">
+		<h4 class="mui-ellipsis" style="width: 50%;line-height: 19px;">{{title}} </h4>
+		<p class="intro">{{year}}/{{countries}}/{{genres}}</p>
+		<p class="intro">导演：{{cast}}</p>
+		<div class="average">
+			<p>豆瓣评分</p>
+			<p style="color: #F9AA36;font-size: 16px;">{{average==0 ? '暂无评分': average}}</p>
+			<p>{{ratings_count}}人</p>
+		</div>
+	</div>
+	
+	<!-- 简介 -->
+	 <div class="mui-content" style="padding: 0 10px;background-color: #fff;">
+		<h5 class="title">剧情简介</h5>
+		<p class="mui-ellipsis-4" style="color: #000;">{{summary}}</p>
+	</div>
+	<!-- 影人 -->
+	<div class="mui-content" style="padding: 0 10px;background-color: #fff;">
+		<h5 class="title">影人</h5>
+		<ul class="casts">
+			<li style="overflow: hidden;" v-for="item in casts" @click="open_actor(item)">
+				<img :src="item.avatars.large" >
+				<p class="mui-ellipsis" style="text-align: center;font-size: 9px;">{{item.name}}</p>
+			</li>
+		</ul>
+	</div>
+	<!-- 短评 -->
+	<h3 style="text-align: center;background-color: #E6E6E6;height: 40px;line-height: 40px;font-weight: 600;font-size: 18px;margin: 0;">短评</h3>
+	<ul class="mui-table-view">
+		<li class="mui-table-view-cell mui-media" v-for="item in commentList">
+			<a href="javascript:;">
+				<img class="mui-media-object mui-pull-left avatar" :src="item.author.avatar">
+				<div class="mui-media-body">
+					<p>
+						<span style="color: #000000;">{{item.author.name}}</span>
+						<span class="mui-pull-right">{{item.created_at| filterTime}}</span>
+					</p>
+					<p class="mui-ellipsis-2">{{item.content}}</p>
+				</div>
+			</a>
+		</li>
+	</ul>
+	
+</div>
+	<script src="../js/mui.js"></script>
+	<script src="../js/vue.js"></script>
+	<script src="../js/tools.js"></script>
+	<script type="text/javascript">
+		mui.init({
+			pullRefresh: {
+				container: '#app',
+				up: {
+					contentnomore: '没有更多数据了',
+					// auto: true,
+					callback: pullup	
+				} 
+			}
+		})
+		
+		function pullup() {
+			mui.getJSON(`https://api.douban.com/v2/movie/subject/${app.id}/comments`,{
+				apikey:'0b2bdeda43b5688921839c8ecb20399b',
+				start: app.commentList.length,
+				count:10
+			}, res=>{
+				app.commentList = app.commentList.concat(res.comments)
+				if (res.comments.length==0) {
+					mui('#app').pullRefresh().endPullupToRefresh(true)
+					setTimeout(() => {
+						// 重新激活上拉加载
+						mui('#app').pullRefresh().refresh(true)
+					},3000)
+				} else{
+					mui('#app').pullRefresh().endPullupToRefresh(false)
+				}
+			})
+		}
+		window.addEventListener('get_detail',event =>{
+			app.title = event.detail.title
+			app.genres = event.detail.genres
+			app.cover = event.detail.cover
+			app.average = event.detail.average
+			app.cast = event.detail.cast
+			app.id = event.detail.post_id
+			mui.getJSON('https://api.douban.com/v2/movie/subject/'+app.id, {
+				apikey:'0b2bdeda43b5688921839c8ecb20399b'
+			}, res => {
+				app.year = res.year
+				app.countries = res.countries[0]
+				app.ratings_count = res.ratings_count
+				app.summary = res.summary
+				app.casts = res.casts
+			})
+			
+			mui.getJSON(`https://api.douban.com/v2/movie/subject/${app.id}/comments`,{
+				apikey:'0b2bdeda43b5688921839c8ecb20399b',
+				start: 0,
+				count:10
+			}, res=>{
+				app.commentList = res.comments
+			})
+		})
+		
+		mui.plusReady(function () {		    
+			mui.back = function() {
+				plus.webview.currentWebview().hide('auto',300)
+			}
+			var self = plus.webview.currentWebview()
+			self.addEventListener('hide',() =>{
+				window.scrollTo(0,0)	
+			})
+			// 预加载
+			actor = mui.preload({
+				url: 'actor.html',
+				id: 'actor.html',
+				styles:{
+					render: 'always',
+					popGesture: 'hide',
+				}
+			}) 
+		})
+
+		var app = new Vue({
+			el:'#app',
+			data:{
+				id: 0,
+				title: "",
+				year: "",
+				countries: "",
+				genres: [],
+				cover: "",
+				average: "",
+				ratings_count: '',
+				cast: "",
+				summary: "",
+				casts: [],
+				commentList: []
+			},
+			methods:{
+				open_actor(item){
+					mui.fire(actor,'get_actor',{
+						id: item.id
+					})
+		
+					setTimeout(() =>{
+						actor.show('slide-in-right',300)
+					},150)
+				}
+			}
+		})
+	</script>
+</body>
+</html>

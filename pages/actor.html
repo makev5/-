@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>演员</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="../css/mui.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="../css/detail.css"/>
+</head>
+<body>
+<div id="app">
+	<!-- header -->
+	<header class="mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">演员</h1>
+	</header>
+	
+	<!-- 内容 -->
+	<div class="mui-content">
+		<!-- 演员封面 -->
+		<div class="banner_wrap">
+			<img class="mui-media-object" :src="cover" >
+		</div>
+		<!-- 演员名字 -->
+		<h4 style="padding: 10px 10px 0;line-height: 19px;">{{author}}</h4>
+		<p style="padding: 0 10px;">{{enauthor}}</p>
+		<!-- 个人简介 -->
+		<div class="mui-content" style="padding: 0 10px;">
+			<h5 class="title">个人简介</h5>
+			<p class="mui-ellipsis-4" style="color: #000;">{{summary}}</p>
+		</div>
+		<!-- 代表作 -->
+		<div class="mui-content" style="padding: 0 10px;">
+			<h5 class="title">代表作品</h5>
+			<ul class="casts">
+				<li v-for="item in works" style="overflow: hidden;">
+					<img :src="item.subject.images.large" >
+					<p class="mui-ellipsis" style="text-align: center; margin: 0;color: #000000;font-size: 10px;">{{item.subject.title}}</p>
+					<p style="color:#F79D18;text-align: center;margin: 0;padding: 0;font-size: 12px;">{{item.subject.rating.average}}分</p>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+<script src="../js/mui.js"></script>
+<script src="../js/vue.js"></script>
+<script type="text/javascript">
+	mui.init()
+	
+	window.addEventListener('get_actor',event => {
+		// 演员详情接口请求
+		mui.getJSON(`https://api.douban.com/v2/movie/celebrity/${event.detail.id}`, {
+			apikey:'0b2bdeda43b5688921839c8ecb20399b'
+		}, res => {
+			app.cover = res.avatars.large
+			app.author = res.name
+			app.enauthor = res.name_en
+			app.summary = res.summary
+			app.works = res.works
+		})
+	})
+	
+	const app = new Vue({
+		el:'#app',
+		data:{
+			cover: '',
+			author: '',
+			enauthor: '',
+			summary: '',
+			works: []
+		}
+	})
+</script>
+</body>
+</html>

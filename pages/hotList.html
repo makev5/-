@@ -1,0 +1,102 @@
+<!-- 热榜 -->
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>热映</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link href="../css/mui.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="../css/movieList.css"/>
+	<style type="text/css">
+		.mui-bar{
+			box-shadow: 0 0 1px rgba(0,0,0,0);
+			background-color: #fff;
+		}
+		.mui-content,.mui-table-view:before{
+			background-color: #fff;
+		}
+	</style>
+</head>
+<body>
+<div id="app">
+	<!-- header -->
+	<header class="mui-bar mui-bar-nav" @click="openSearch()">
+		<div class="mui-input-row mui-search">
+		    <input type="search" class="mui-input-clear" placeholder="电影/电视剧/影人" style="font-size: 10px;" disabled>
+		</div>
+	</header>
+	
+	<!-- 列表 -->
+	<div class="mui-content">
+		<ul class="mui-table-view" v-cloak v-if="movieList.length !=0" >
+			<li class="mui-table-view-cell mui-media" v-for="item in movieList" :key="item.id" @click="open_detail (item)">
+				<a href="javascript:;">
+					<img class="mui-pull-left mui-img" :src="item.img">
+					<div class="mui-media-body">
+						<p class="title">{{item.title}}</p>
+						<p class="mui-ellipsis">
+							<span>{{item.genres}}</span>
+							<span style="padding-left: 10px;color:#F79D18;">{{item.average==0 ? '暂无评' : item.average}}分</span>
+						</p>
+						<p class="mui-ellipsis">导演：{{item.directors}}</p>
+						<p class="mui-ellipsis">主演：{{item.casts}}</p>
+					</div>
+				</a>
+			</li>
+		</ul>
+	</div>	
+</div>	
+<script src="../js/vue.js"></script>
+<script src="../js/convert.js"></script>
+<script src="../js/mui.js"></script>
+<script src="../js/openDetail.js"></script>
+<script type="text/javascript">
+	mui.init()
+	
+	// 热榜接口请求
+	mui.getJSON('https://api.douban.com/v2/movie/in_theaters', {
+		apikey:'0b2bdeda43b5688921839c8ecb20399b',
+		start: 0,
+		count: 8
+	},res =>{
+		app.movieList = convert(res.subjects)
+	})
+		
+	const app = new Vue({
+		el:'#app',
+		data:{
+			movieList: []	// 电影列表
+		},
+		methods:{
+			// 打开搜索页
+			openSearch(){	
+				mui.openWindow({
+					url: 'search.html',
+					id: 'search.html',
+				})
+			},
+			
+			// 打开电影详情页
+			open_detail(item) {
+				mui.fire(detail,'get_detail',{
+					post_id: item.id,
+					cover: item.img,
+					average: item.average,
+					title: item.title,
+					genres: item.genres,
+					cast: item.directors
+				})
+				// 设置原生标题
+				titleNView.titleText = item.title
+				detail.setStyle({
+					titleNView:titleNView
+				})
+				setTimeout(() =>{
+					detail.show('slide-in-right',300)
+				},150)
+			}
+		}
+	})
+</script>
+</body>
+</html>
